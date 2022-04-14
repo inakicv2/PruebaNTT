@@ -1,0 +1,15 @@
+#DO NOT TOUCH
+version: "3"
+services:
+  sonarqube:
+    image: sonarqube:lts
+    ports:
+      - 9000:9000  
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
