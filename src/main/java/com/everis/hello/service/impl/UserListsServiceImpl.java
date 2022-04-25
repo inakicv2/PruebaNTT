@@ -74,7 +74,9 @@ public class UserListsServiceImpl implements UserListsService {
 						"Error validation: listname " + articleListDto.getListName() + " must not be repeated.");
 			}
 		}, () -> {
-			this.userRepository.save(new User(username, List.of(articleListToAdd)));
+			User newUserToAdd = new User(username, List.of(articleListToAdd));
+			this.validateUser(userMapper.userToUserDto(newUserToAdd));
+			this.userRepository.save(newUserToAdd);
 		});
 		return new ResponseEntity("List " + articleListDto.getListName() + " added successfully for user " + username,
 				HttpStatus.OK);
@@ -176,7 +178,6 @@ public class UserListsServiceImpl implements UserListsService {
 					            .retrieve()
 					            .bodyToMono(String.class);
 					 productMono.subscribe(product ->{
-						 System.out.println(product);
 						 try {
 							productList.add(objectMapper.readValue(product, ProductDto.class));
 						} catch (JsonMappingException e) {
@@ -187,10 +188,13 @@ public class UserListsServiceImpl implements UserListsService {
 					 });
 				}
 				articleResponseDto.setIdArticleList(productList);
+			}else {
+				throw new ValidationException(
+						"Error validation: listname " + listname + " not exists for user : " + username);
 			}
 			return new ResponseEntity(articleResponseDto, HttpStatus.OK);
 		}else {
-			throw new ValidationException("Error validation: username " + username + " don't exists.");
+			throw new ValidationException("Error validation: username " + username + "or listname:" + listname +" don't exists.");
 		}
 		
 	}
